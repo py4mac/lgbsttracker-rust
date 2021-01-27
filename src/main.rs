@@ -1,21 +1,20 @@
 mod config;
+mod db;
+mod handlers;
 mod models;
 
-use crate::models::Status;
-use actix_web::{web, App, get, HttpRequest, HttpServer, Responder};
+
+use actix_web::{App, HttpServer};
 use dotenv::dotenv;
+use tokio_postgres::NoTls;
+use crate::handlers::*;
+
+// async fn greet(req: HttpRequest) -> impl Responder {
+//     let name = req.match_info().get("name").unwrap_or("World");
+//     format!("Hello {}!", &name)
+// }
 
 
-async fn greet(req: HttpRequest) -> impl Responder {
-    let name = req.match_info().get("name").unwrap_or("World");
-    format!("Hello {}!", &name)
-}
-
-#[get("/status")]
-async fn status() -> impl Responder {
-    web::Json(Status { status: String::from("OK") })
-
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -24,11 +23,15 @@ async fn main() -> std::io::Result<()> {
 
     let config = crate::config::Config::from_env().unwrap();
 
-    HttpServer::new(|| {
+    let pool = config.pg.create_pool(NoTls).unwrap();
+
+    HttpServer::new(move || {
         App::new()
             // .route("/", web::get().to(greet))
-            .route("/user/{name}", web::get().to(greet))
+            // .route("/user/{name}", web::get().to(greet))
+            .data(pool.clone())
             .service(status)
+            .service(get_todos)
     })
     .bind(format!("{}:{}", config.server.host, config.server.port))?
     .run()
