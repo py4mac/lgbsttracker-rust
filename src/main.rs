@@ -32,6 +32,7 @@ async fn main() -> std::io::Result<()> {
             .data(pool.clone())
             .service(status)
             .service(get_todos)
+            .service(get_items)
     })
     .bind(format!("{}:{}", config.server.host, config.server.port))?
     .run()

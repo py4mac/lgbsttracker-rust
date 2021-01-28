@@ -23,3 +23,17 @@ pub async fn get_todos(db_pool: web::Data<Pool>) -> impl Responder {
     }
 
 }
+
+#[get("/item/{id}")]
+pub async fn get_items(db_pool: web::Data<Pool>, path: web::Path<i32>) -> impl Responder {
+    let client: Client = 
+        db_pool.get().await.expect("Error connecting to database");
+    
+    let result = db::get_items(&client, path.0).await;
+    
+    match result {
+        Ok(item) => HttpResponse::Ok().json(item),
+        Err(_) => HttpResponse::InternalServerError().into()
+    }
+
+}
