@@ -28,3 +28,8 @@ pub struct TodoItem {
 pub struct CreateTodo {
     pub title: String,
 }
+
+#[derive(Serialize)]
+pub struct ResultResponse {
+    pub success: bool,
+}

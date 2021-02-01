@@ -34,6 +34,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_todos)
             .service(get_items)
             .service(create_todo)
+            .service(check_item)
     })
     .bind(format!("{}:{}", config.server.host, config.server.port))?
     .run()
